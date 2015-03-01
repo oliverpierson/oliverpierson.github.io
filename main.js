@@ -30,35 +30,64 @@
     var canvas = document.getElementById('stage');
     var ctx = canvas.getContext('2d');
     
-    var radius = 0;
+    var radii = [0.0];
     var centerX = 320;
     var centerY = 320;
+    var separation = 50;
 
     var prevTimeStamp = 0.0;
-    var timeSinceFront = 0.0;
+    var timeOfLastFront = 0.0;
     var c = 25; // wave speed in px per second
+    //var wavelength = 16; // in px
+    var wavelength = document.getElementById('wavelength').value;
+    var T = wavelength/c; 
+
+    function drawWaveCrest(i, time) {
+        var radius = radii[i];
+        if (radius <= Math.sqrt(2)*(canvas.width/2)) {
+            ctx.beginPath();
+            ctx.arc(centerX + separation/2, centerY, radius, 0, Math.PI*2, true);
+            ctx.closePath();
+            ctx.strokeStyle='red';
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(centerX - separation/2, centerY, radius, 0, Math.PI*2, true);
+            ctx.closePath();
+            ctx.strokeStyle='red';
+            ctx.stroke();
+
+            radii[i] += c*time/1000;
+        } else {
+            if (i == 0) {
+                radii.shift();
+            }
+        }
+    }
 
 
     function animate(timeStamp) {
         requestID = requestAnimationFrame(animate);
         if ( prevTimeStamp <= 0.0 ) {
             prevTimeStamp = timeStamp;
-            timeSinceFront = timeStamp;
+            timeOfLastFront = timeStamp;
         }
         var timeElapsed = timeStamp - prevTimeStamp;
         prevTimeStamp = timeStamp;
 
-        if (radius <= Math.sqrt(2)*(canvas.width/2)) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, 0, Math.PI*2, true);
-            ctx.closePath();
-            ctx.strokeStyle='red';
-            ctx.stroke();
-            radius += c*timeElapsed/1000; 
-        } else {
-            cancelAnimationFrame(requestID);
+        if ( (timeStamp - timeOfLastFront)/1000 >= T ) {
+            radii.push(0.0);
+            timeOfLastFront = timeStamp;
         }
+        
+        console.log(radii.length);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        wavelength = document.getElementById('wavelength').value;
+        T = wavelength/c; 
+        for (var i = 0; i < radii.length; ++i) {
+            drawWaveCrest(i, timeElapsed);
+        }
+        if ( radii.length == 0 ) cancelAnimationFrame(requestID);
+        //cancelAnimationFrame(requestID);
     }
     requestId = requestAnimationFrame(animate);
 })();
