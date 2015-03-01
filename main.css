@@ -1,0 +1,10 @@
+#page-wrapper {
+    width: 640px;
+    background: #FFFFFF;
+    padding: 1em;
+    margin: 1em;
+}
+
+canvas {
+    background: #EEE;
+}
