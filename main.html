@@ -10,8 +10,12 @@
             <input name="wavelength" type="number" min="0" max="1000" id="wavelength" value="16"></input>
         </div>
         <div class="entrybox">Separation (in px):
-            <input name="separation" type="number" min="0" max="50" id="separation" value="5"></input>
+            <input name="separation" type="number" min="0" max="50" id="separation" value="25" onkeypress="updateSources()"></input>
         </div>
+        <select id="numOfSources" type="number">
+            <option value=3>3</option>
+            <option value=2>2</option>
+        </select>
         <button id="pause" class="btn" onclick="playOrPause()">Pause</button>
         <canvas id="stage" width="640" height="640">
         </canvas>

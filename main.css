@@ -9,20 +9,26 @@ canvas {
     background: #EEE;
 }
 
-.entrybox {
+input {
+    font-family: Monaco;
+    font-size: 24px;
+}
+
+.entrybox, select {
     font-family: Monaco;
     font-size: 24px;
 }
 
 .btn {
-  -webkit-border-radius: 28;
+/*  -webkit-border-radius: 28;
   -moz-border-radius: 28;
-  border-radius: 28px;
+  border-radius: 28px;*/
   font-family: Monaco;
   color: #ffffff;
   font-size: 20px;
   background: #3498db;
-  padding: 10px 20px 10px 20px;
+  /*padding: 10px 20px 10px 20px;*/
+  padding: 5px 10px 5px 10px;
   text-decoration: none;
 }
 

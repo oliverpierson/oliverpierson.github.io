@@ -1,3 +1,7 @@
+// requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
+// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+// http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+// MIT license
 (function() {
     var lastTime = 0;
     var vendors = ['ms', 'moz', 'webkit', 'o'];
@@ -26,8 +30,10 @@
     console.log('requestAnimationFrame initialized for: ' + vendors[x]);
 }());
 
+
+
+
 var paused = false;
-var lastPausedTime = 0.0
 function playOrPause() {
     paused = !paused;
     if ( paused ) {
@@ -38,79 +44,44 @@ function playOrPause() {
         startAnimation();
     }
 }
+var updateSources; 
 
 var radii = [0.0];
 function startAnimation() {
     var canvas = document.getElementById('stage');
     var ctx = canvas.getContext('2d');
     
-    var centerX = 320;
-    var centerY = 320;
+    var centerX = canvas.width/2;
+    var centerY = canvas.height/2;
     var separation = Number(document.getElementById('separation').value);
-
+    var numOfSources = Number(document.getElementById('numOfSources').value);
+    var sources = [];
+    updateSources = function() {
+        sources = [];
+        numOfSources = Number(document.getElementById('numOfSources').value);
+        separation = Number(document.getElementById('separation').value);
+        for ( var i = 0; i < numOfSources; i++ ) {
+            sources.push(centerX - (Math.floor(numOfSources/2) - i)*separation)
+        }
+    }; 
+    updateSources();
     var prevTimeStamp = 0.0;
     var timeOfLastFront = 0.0;
     var c = 25; // wave speed in px per second
-    //var wavelength = 16; // in px
     var wavelength = Number(document.getElementById('wavelength').value);
     var T = wavelength/c; 
-    var startTime = false;
     
-
-    function drawWaveCrestAndTrough(i, time) {
-        var radius = radii[i];
-        if (radius <= Math.sqrt(2)*(canvas.width/2 + +separation + +wavelength) ) {
-            ctx.beginPath();
-            ctx.arc(centerX + separation/2, centerY, radius, 0, Math.PI*2, true);
-            ctx.closePath();
-            ctx.strokeStyle='grey';
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(centerX - separation/2, centerY, radius, 0, Math.PI*2, true);
-            ctx.closePath();
-            ctx.strokeStyle='grey';
-            ctx.stroke();
-
-            radius = radii[i] - wavelength/2;
-            if ( radius > 0 ) {
-                ctx.beginPath();
-                ctx.arc(centerX + separation/2, centerY, radius, 0, Math.PI*2, true);
-                ctx.closePath();
-                ctx.strokeStyle='black';
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.arc(centerX - separation/2, centerY, radius, 0, Math.PI*2, true);
-                ctx.closePath();
-                ctx.strokeStyle='black';
-                ctx.stroke();
-            }
-            radii[i] += c*time/1000;
-        } else {
-            if (i == 0) {
-                radii.shift();
-            } else { console.log('radius error.'); }
-        }
+    function drawCircle(x, y, radius, color) {
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI*2, true);
+        ctx.closePath();
+        ctx.strokeStyle=color;
+        ctx.stroke();
     }
-
-    function drawWaveTrough(i, time) {
-        var radius = radii[i] - wavelength/2;
-        if (radius <= Math.sqrt(2)*(canvas.width/2) && radius > 0) {
-            ctx.beginPath();
-            ctx.arc(centerX + separation/2, centerY, radius, 0, Math.PI*2, true);
-            ctx.closePath();
-            ctx.strokeStyle='black';
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(centerX - separation/2, centerY, radius, 0, Math.PI*2, true);
-            ctx.closePath();
-            ctx.strokeStyle='black';
-            ctx.stroke();
-        }
-    }
-
 
     function animate(timeStamp) {
         requestID = requestAnimationFrame(animate);
+        updateSources();
         if ( prevTimeStamp <= 0.0 ) {
             prevTimeStamp = timeStamp;
             timeOfLastFront = timeStamp;
@@ -129,8 +100,14 @@ function startAnimation() {
         T = wavelength/c; 
         separation = document.getElementById('separation').value;
         for (var i = 0; i < radii.length; ++i) {
-            drawWaveCrestAndTrough(i, timeElapsed);
-            //drawWaveTrough(i, timeElapsed);
+            for ( var j = 0; j < numOfSources; ++j ) {
+                drawCircle(sources[j], centerY, radii[i], '#8b2252');
+                if ( radii[i] > wavelength/2 )
+                    drawCircle(sources[j], centerY, radii[i] - wavelength/2, '#008282');
+            }
+            radii[i] += c*timeElapsed/1000;
+            if ( radii[i] >=  Math.sqrt(2)*(canvas.width/2 + numOfSources*separation + +wavelength) )
+                radii.shift();
         }
         if ( radii.length == 0 ) cancelAnimationFrame(requestID);
         if ( paused ) {
