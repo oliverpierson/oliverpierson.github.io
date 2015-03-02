@@ -44,15 +44,14 @@ function playOrPause() {
         startAnimation();
     }
 }
-var updateSources; 
 
-var radii = [0.0];
 function startAnimation() {
     var canvas = document.getElementById('stage');
     var ctx = canvas.getContext('2d');
     ctx.lineWidth = 5;
     ctx.globalAlpha = 0.5;
     
+    var radii = [0.0];
     var centerX = canvas.width/2;
     var centerY = canvas.height/2;
     var separation = Number(document.getElementById('separation').value);
