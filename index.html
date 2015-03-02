@@ -12,10 +12,12 @@
         <div class="entrybox">Separation (in px):
             <input name="separation" type="number" min="0" max="100" id="separation" value="24"></input>
         </div>
-        <select id="numOfSources" type="number">
-            <option value=3>3</option>
-            <option value=2>2</option>
-        </select>
+        <div class="entrybox">Number of sources: 
+            <select id="numOfSources" type="number">
+                <option value=2>2</option>
+                <option value=3>3</option>
+            </select>
+        </div>
         <button id="pause" class="btn" onclick="playOrPause()">Pause</button>
         <canvas id="stage" width="640" height="640">
         </canvas>

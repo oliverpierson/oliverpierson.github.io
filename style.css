@@ -14,7 +14,7 @@ input {
     font-size: 24px;
 }
 
-.entrybox, select {
+.entrybox {
     font-family: Monaco;
     font-size: 24px;
 }
