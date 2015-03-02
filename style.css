@@ -24,21 +24,21 @@ input {
   -moz-border-radius: 28;
   border-radius: 28px;*/
   font-family: Monaco;
-  color: #ffffff;
+  color: #000000;
   font-size: 20px;
-  background: #3498db;
+  background: #f5f3ee;
   /*padding: 10px 20px 10px 20px;*/
   padding: 5px 10px 5px 10px;
   text-decoration: none;
 }
 
 .btn:hover {
-  background: #3cb0fd;
-  background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
-  background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
-  background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
-  background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
-  background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+  background: #d9d9d9;
+  background-image: -webkit-linear-gradient(top, #f5f3ee, #d9d9d9);
+  background-image: -moz-linear-gradient(top, #f5f3ee, #d9d9d9);
+  background-image: -ms-linear-gradient(top, #f5f3ee, #d9d9d9);
+  background-image: -o-linear-gradient(top, #f5f3ee, #d9d9d9);
+  background-image: linear-gradient(to bottom, #f5f3ee, #d9d9d9);
   text-decoration: none;
 }
 
