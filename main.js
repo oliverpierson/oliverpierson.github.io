@@ -45,6 +45,40 @@ function playOrPause() {
     }
 }
 
+function handleMouseMove(event) {
+    var dot, eventDoc, doc, body, pageX, pageY;
+
+    event = event || window.event; // IE-ism
+
+    // If pageX/Y aren't available and clientX/Y are,
+    // calculate pageX/Y - logic taken from jQuery.
+    // (This is to support old IE)
+    if (event.pageX == null && event.clientX != null) {
+        eventDoc = (event.target && event.target.ownerDocument) || document;
+        doc = eventDoc.documentElement;
+        body = eventDoc.body;
+
+        event.pageX = event.clientX +
+          (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
+          (doc && doc.clientLeft || body && body.clientLeft || 0);
+        event.pageY = event.clientY +
+          (doc && doc.scrollTop  || body && body.scrollTop  || 0) -
+          (doc && doc.clientTop  || body && body.clientTop  || 0 );
+    }
+    var div = document.getElementById('stage');
+    var mouseX = event.pageX - div.offsetLeft;
+        mouseY = event.pageY - div.offsetTop;
+    if ( mouseX >= 0 && mouseX <= div.width &&
+         mouseY >= 0 && mouseY <= div.height ) {
+        document.getElementById('mouseX').innerHTML = mouseX - div.width/2;
+        document.getElementById('mouseY').innerHTML = div.height/2 - mouseY;
+     } else {
+        document.getElementById('mouseX').innerHTML = "";
+        document.getElementById('mouseY').innerHTML = "";
+     }
+
+}
+
 function startAnimation() {
     var canvas = document.getElementById('stage');
     var ctx = canvas.getContext('2d');
@@ -61,8 +95,14 @@ function startAnimation() {
         sources = [];
         numOfSources = Number(document.getElementById('numOfSources').value);
         separation = Number(document.getElementById('separation').value);
-        for ( var i = 0; i < numOfSources; i++ ) {
-            sources.push(centerX - (Math.floor(numOfSources/2) - i)*separation)
+        if ( numOfSources % 2 == 0 ) {
+            for ( var i = 0; i < numOfSources; i++ ) {
+                sources.push(centerX - separation/2 + i*separation);
+            }
+        } else {
+            for ( var i = 0; i < numOfSources; i++ ) {
+                sources.push(centerX - (Math.floor(numOfSources/2) - i)*separation)
+            }
         }
     }; 
     updateSources();
@@ -118,4 +158,7 @@ function startAnimation() {
     requestId = requestAnimationFrame(animate);
 }
 
-(function() { startAnimation(); })();
+(function() { 
+    document.onmousemove= handleMouseMove;
+    startAnimation(); 
+})();
