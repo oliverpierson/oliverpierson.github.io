@@ -32,8 +32,10 @@
 
 
 
-
+var updateSeparation,
+    updateWavelength;
 var paused = false;
+
 function playOrPause() {
     paused = !paused;
     if ( paused ) {
@@ -44,7 +46,7 @@ function playOrPause() {
         startAnimation();
     }
 }
-
+// adapted from stackoverflow
 function handleMouseMove(event) {
     var dot, eventDoc, doc, body, pageX, pageY;
 
@@ -85,12 +87,15 @@ function startAnimation() {
     ctx.lineWidth = 5;
     ctx.globalAlpha = 0.5;
     
-    var radii = [0.0];
-    var centerX = canvas.width/2;
-    var centerY = canvas.height/2;
-    var separation = Number(document.getElementById('separation').value);
-    var numOfSources = Number(document.getElementById('numOfSources').value);
-    var sources = [];
+    var radii = [0.0],
+        centerX = canvas.width/2,
+        centerY = canvas.height/2,
+        c = 25, // wave speed in px per second
+        separation,
+        wavelength,
+        numOfSources,
+        sources = [];
+
     updateSources = function() {
         sources = [];
         numOfSources = Number(document.getElementById('numOfSources').value);
@@ -105,13 +110,26 @@ function startAnimation() {
             }
         }
     }; 
+   
+    updateSeparation = function () {
+        separation = Number(document.getElementById('separation').value);
+        updateSources();
+    }
+
+    updateWavelength= function (){
+        wavelength = Number(document.getElementById('wavelength').value);
+        T = wavelength/c;
+        ctx.lineWidth = wavelength/6;
+    }
+
     updateSources();
+    updateSeparation();
+    updateWavelength();
+
     var prevTimeStamp = 0.0;
     var timeOfLastFront = 0.0;
-    var c = 25; // wave speed in px per second
-    var wavelength = Number(document.getElementById('wavelength').value);
     var T = wavelength/c; 
-    
+   
     function drawCircle(x, y, radius, color) {
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, Math.PI*2, true);
@@ -122,7 +140,6 @@ function startAnimation() {
 
     function animate(timeStamp) {
         requestID = requestAnimationFrame(animate);
-        updateSources();
         if ( prevTimeStamp <= 0.0 ) {
             prevTimeStamp = timeStamp;
             timeOfLastFront = timeStamp;
@@ -135,11 +152,8 @@ function startAnimation() {
             timeOfLastFront = timeStamp;
         }
         
-        console.log(radii.length);
+        //console.log(radii.length);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        wavelength = document.getElementById('wavelength').value;
-        T = wavelength/c; 
-        separation = document.getElementById('separation').value;
         for (var i = 0; i < radii.length; ++i) {
             for ( var j = 0; j < numOfSources; ++j ) {
                 drawCircle(sources[j], centerY, radii[i], '#8b2252');

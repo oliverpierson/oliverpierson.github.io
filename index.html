@@ -7,13 +7,13 @@
 <body>
     <div id="page-wrapper">
         <div class="entrybox">Wavelength (in px):
-            <input name="wavelength" type="number" min="10" max="1000" id="wavelength" value="30"></input>
+            <input name="wavelength" type="number" min="10" max="1000" id="wavelength" value="30" onchange="updateWavelength()"></input>
         </div>
         <div class="entrybox">Separation (in px):
-            <input name="separation" type="number" min="0" max="100" id="separation" value="45"></input>
+            <input name="separation" type="number" min="0" max="100" id="separation" value="45" onchange="updateSeparation()"></input>
         </div>
         <div class="entrybox">Number of sources: 
-            <select id="numOfSources" type="number">
+            <select id="numOfSources" type="number" onclick="updateSources()">
                 <option value=2>2</option>
                 <option value=3>3</option>
             </select>
