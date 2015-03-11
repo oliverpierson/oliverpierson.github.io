@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF=8">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="page-wrapper">
+        <div class="entrybox">Wavelength (in px):
+            <input name="wavelength" type="number" min="10" max="1000" id="wavelength" value="30" onchange="updateWavelength()"></input>
+        </div>
+        <div class="entrybox">Separation (in px):
+            <input name="separation" type="number" min="0" max="100" id="separation" value="45" onchange="updateSeparation()"></input>
+        </div>
+        <div class="entrybox">Number of sources: 
+            <select id="numOfSources" type="number" onchange="updateSources()">
+                <option value=2>2</option>
+                <option value=3>3</option>
+                <option value=4>4</option>
+                <option value=5>5</option>
+                <option value=6>6</option>
+                <option value=7>7</option>
+            </select>
+        </div>
+        <div class="entrybox">X (in px): <output class="databox" id="mouseX"></output></div>
+        <div class="entrybox">Y (in px): <output class="databox" id="mouseY"></output></div>
+        <canvas id="stage" width="640" height="640">
+        </canvas>
+    </div>
+    <script src="noanim.js"></script>
+</body>
+</html>

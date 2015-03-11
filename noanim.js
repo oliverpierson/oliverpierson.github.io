@@ -33,19 +33,10 @@
 
 
 var updateSeparation,
-    updateWavelength;
-var paused = false;
+    updateWavelength,
+    updateCanvas,
+    updateSources;
 
-function playOrPause() {
-    paused = !paused;
-    if ( paused ) {
-        document.getElementById('pause').innerHTML = "Play";
-    }
-    if ( !paused ) {
-        document.getElementById('pause').innerHTML = "Pause";
-        startAnimation();
-    }
-}
 // adapted from stackoverflow
 function handleMouseMove(event) {
     var dot, eventDoc, doc, body, pageX, pageY;
@@ -81,7 +72,7 @@ function handleMouseMove(event) {
 
 }
 
-function startAnimation() {
+function setupCanvas() {
     var canvas = document.getElementById('stage');
     var ctx = canvas.getContext('2d');
     ctx.lineWidth = 5;
@@ -102,86 +93,58 @@ function startAnimation() {
         separation = Number(document.getElementById('separation').value);
         if ( numOfSources % 2 == 0 ) {
             for ( var i = 0; i < numOfSources; i++ ) {
-                sources.push(centerX - separation/2 + i*separation);
+                sources.push(centerX - numOfSources*separation/2.0 + i*separation + separation/2.0);
+                //sources.push(centerX - separation/2 + i*separation);
             }
         } else {
             for ( var i = 0; i < numOfSources; i++ ) {
-                sources.push(centerX - (Math.floor(numOfSources/2) - i)*separation)
+                sources.push(centerX - Math.floor(numOfSources/2.0)*separation + i*separation);
+                //sources.push(centerX - (Math.floor(numOfSources/2) - i)*separation)
             }
         }
+        updateCanvas();
     }; 
    
     updateSeparation = function () {
         separation = Number(document.getElementById('separation').value);
         updateSources();
-    }
+        updateCanvas();
+    };
 
     updateWavelength= function (){
         wavelength = Number(document.getElementById('wavelength').value);
         T = wavelength/c;
         ctx.lineWidth = wavelength/6;
-    }
+        updateCanvas();
+    };
 
-    updateSources();
-    updateSeparation();
-    updateWavelength();
-
-    var prevTimeStamp = 0.0;
-    var timeOfLastFront = 0.0;
-    var T = wavelength/c; 
-   
     function drawCircle(x, y, radius, color) {
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, Math.PI*2, true);
         ctx.closePath();
         ctx.strokeStyle=color;
         ctx.stroke();
-    }
+    };
 
-    function animate(timeStamp) {
-        requestID = requestAnimationFrame(animate);
-        if ( prevTimeStamp <= 0.0 ) {
-            prevTimeStamp = timeStamp;
-            timeOfLastFront = timeStamp;
-        }
-        var timeElapsed = timeStamp - prevTimeStamp;
-        prevTimeStamp = timeStamp;
-
-        if ( (timeStamp - timeOfLastFront)/1000 >= T ) {
-            radii.push(0.0);
-            timeOfLastFront = timeStamp;
-        }
-        
-        //console.log(radii.length);
+    updateCanvas = function () {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        sources.forEach( function(source) {
-            radii.forEach ( function(r) {
-                drawCircle(source, centerY, r, "#8b2552");
-                if ( r > wavelength/2 )
-                    drawCircle(source, centerY, r - wavelength/2, "#008282");
-            } )
-        });
-        radii = radii.map( function(r) { return r + c*timeElapsed/1000; } )
-            .filter( function(r) { return r <= Math.sqrt(2)*(canvas.width/2 + numOfSources*separation + +wavelength); });
-        //for (var i = 0; i < radii.length; ++i) {
-        //    for ( var j = 0; j < numOfSources; ++j ) {
-        //        drawCircle(sources[j], centerY, radii[i], '#8b2252');
-        //        if ( radii[i] > wavelength/2 )
-        //            drawCircle(sources[j], centerY, radii[i] - wavelength/2, '#008282');
-        //    }
-        //    radii[i] += c*timeElapsed/1000;
-        //    if ( radii[i] >=  Math.sqrt(2)*(canvas.width/2 + numOfSources*separation + +wavelength) )
-        //        radii.shift();
-        //}
-        if ( radii.length == 0 ) cancelAnimationFrame(requestID);
-        if ( paused ) {
-            cancelAnimationFrame(requestID);
-        }
-    }
-    requestId = requestAnimationFrame(animate);
+        for( r = 0; 
+             r <= Math.sqrt(2)*(canvas.width/2 + numOfSources*separation + +wavelength);
+             r += wavelength ) {
+                 sources.forEach( function (source) {
+                     drawCircle(source, centerY, r, "#8b2552");
+                     if ( r > wavelength/2 )
+                         drawCircle(source, centerY, r - wavelength/2, "#008282");
+                 } ) } };
+
+    updateSources();
+    updateSeparation();
+    updateWavelength();
+    updateCanvas();
 }
 
 (function() { 
     document.onmousemove= handleMouseMove;
-    startAnimation(); 
+    setupCanvas();
+    updateCanvas();
 })();
