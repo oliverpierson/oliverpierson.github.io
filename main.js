@@ -138,6 +138,16 @@ function startAnimation() {
         ctx.stroke();
     }
 
+    function drawCenterLine() {
+        var temp = ctx.lineWidth;
+        ctx.lineWidth = 1;
+        ctx.moveTo(0, canvas.height/2.0);
+        ctx.lineTo(canvas.width, canvas.width/2.0);
+        ctx.strokeStyle = "#000000";
+        ctx.stroke();
+        ctx.lineWidth = temp;
+    }
+
     function animate(timeStamp) {
         requestID = requestAnimationFrame(animate);
         if ( prevTimeStamp <= 0.0 ) {
@@ -154,6 +164,7 @@ function startAnimation() {
         
         //console.log(radii.length);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawCenterLine();
         sources.forEach( function(source) {
             radii.forEach ( function(r) {
                 drawCircle(source, centerY, r, "#8b2552");
