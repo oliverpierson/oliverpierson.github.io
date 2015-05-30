@@ -87,6 +87,9 @@ var atomColor = new Array(nMax);	// and colors!
 var species = new Array(nMax);
 var ABEps = ACEps = BCEps = 1.0;
 var AAEps = BBEps = CCEps = 1.0;
+ABEps = 0.1;
+ACEps = 0.1;
+BCEps = 8.0;
 var bPercent = Number(document.getElementById('bReadout').innerHTML);
 
 // Carefully constructed list of colors for indicating speeds:
@@ -1312,6 +1315,13 @@ function showJS() {
     dataArea.value += "{pointer:" + fixedTList[fixedTList.length-1].pointer + ", temp:" +
     fixedTList[fixedTList.length-1].temp + "}]";
   }
+  // write species to files
+  dataArea.value += ",\nspecies: ["
+  for(var i=0; i<N-1; i++) {
+      dataArea.value += '"' + species[i] + '"' + ",\n";
+  }
+  dataArea.value += '"' + species[N-1] + '"' + "]"
+
   dataArea.value += "}\n";
 }
 
@@ -1357,6 +1367,13 @@ function loadPreset() {
   if (selectedAtom >= N) {
     selectedAtom = -1;
     selectDataPanel.style.display = "none";
+  }
+
+  // add species info if available
+  if(presetList[index].species) {
+    for(var i=0; i<N; i++) {
+        species[i] = presetList[index].species[i];
+    }
   }
   computeAccelerations();
   reset();
