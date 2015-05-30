@@ -14,6 +14,9 @@ var canvas = document.getElementById('theCanvas');
 var context = canvas.getContext('2d');
 var canvasDiv = document.getElementById('canvasDiv');
 var startButton = document.getElementById('startButton');
+var aReadout = document.getElementById('aReadout');
+var bReadout = document.getElementById('bReadout');
+var cReadout = document.getElementById('cReadout');
 var nReadout = document.getElementById('nReadout');
 var nSlider = document.getElementById('nSlider');
 var sizeReadout = document.getElementById('sizeReadout');
@@ -82,7 +85,8 @@ var atomColor = new Array(nMax);	// and colors!
 
 // and species
 var species = new Array(nMax);
-var diffSpeciesEps = Number(document.getElementById('epsReadout').innerHTML);
+var ABEps = ACEps = BCEps = 1.0;
+var AAEps = BBEps = CCEps = 1.0;
 var bPercent = Number(document.getElementById('bReadout').innerHTML);
 
 // Carefully constructed list of colors for indicating speeds:
@@ -118,7 +122,6 @@ function init() {
   if (mobile) nSlider.value = "100"; else nSlider.value = "500";
   changeSize();
   changeN();
-  setSpecies();
 
   // fill the presets menu:
   for (var item=0; item<presetList.length; item++) {
@@ -206,6 +209,7 @@ function computeAccelerations() {
   var g = Number(getGravity());
   var wallStiffness = 50;						// spring constant for bouncing off walls
   var wallForce = 0.0;
+  var diffSpeciesEps;
   potentialE = 0.0;
 
   // first check for bounces off walls:
@@ -318,12 +322,25 @@ function computeAccelerations() {
     repel = attract * attract;
     //potentialE += (4.0 * (repel - attract)) - pEatCutoff;
     fOverR = 24.0 * ((2.0 * repel) - attract) * rSquaredInv;
-    if( species[i] != species[j] ) {
-      fOverR *= diffSpeciesEps;
-      potentialE += diffSpeciesEps*(4.0 * (repel - attract)) - pEatCutoff;
-    } else {
-      potentialE += (4.0 * (repel - attract)) - pEatCutoff;
+    iSpecies = species[i];
+    jSpecies = species[j];
+    if( iSpecies != jSpecies ) {
+        if( (iSpecies == "A" && jSpecies == "B") || (iSpecies == "B" && jSpecies == "A") )
+            diffSpeciesEps = ABEps;
+        else if( (iSpecies == "A" && jSpecies == "C") || (iSpecies == "C" && jSpecies == "A") ) 
+            diffSpeciesEps = ACEps;
+        else if( (iSpecies == "B" && jSpecies == "C") || (iSpecies == "C" && jSpecies == "B") ) 
+            diffSpeciesEps = BCEps;
+    } else /* iSpecies == jSpecies */ {
+        if( iSpecies == "A" )
+            diffSpeciesEps = AAEps;
+        else if( iSpecies == "B" )
+            diffSpeciesEps = BBEps;
+        else if( iSpecies == "C" )
+            diffSpeciesEps = CCEps;
     }
+    fOverR *= diffSpeciesEps;
+    potentialE += diffSpeciesEps*(4.0 * (repel - attract)) - pEatCutoff;
     fx = fOverR * dx;
     fy = fOverR * dy;
     ax[i] += fx;  // add this force on to i's acceleration (m = 1)
@@ -756,64 +773,29 @@ function deselectBonds() {
   bondSelect.selectedIndex = 0;
 }
 
-function incSpecies() {
-  if(bPercent < 1.0) {
-    bPercent += 0.01;
-    if(bPercent > 1.0) bPercent = 1.0;
-    setSpecies();
-    paintCanvas();
-  }
+function addAtom(spec) {
+    changeN(1, spec);
 }
 
-function decSpecies() {
-  if(bPercent > 0.0) {
-    bPercent -= 0.01;
-    if(bPercent < 0.0) bPercent = 0.0;
-    setSpecies();
-    paintCanvas();
-  }
+function removeAtom(spec) {
+    changeN(-1);
 }
 
-function setSpecies() {
-  species.fill("A");
-
-  if(bPercent == 0.0) {
-    bReadout.innerHTML = bPercent.toFixed(2);
-    return;  // already filled with A
-  }
-  if(bPercent == 1.0) {
-    species.fill("B");
-    bReadout.innerHTML = bPercent.toFixed(2);
-    return;
-  }
-
-  for(var i = 0; i < Math.floor(bPercent*N); i++) {
-    k = Math.round(N*Math.random());
-    while(species[k] == "B")
-      k = Math.round(N*Math.random());
-    species[k] = "B";
-  }
-  bReadout.innerHTML = bPercent.toFixed(2);
-}
-
-function incSpeciesEps() {
-  if(diffSpeciesEps < 1.0) {
-    diffSpeciesEps += 0.01;
-    if(diffSpeciesEps > 1.0) diffSpeciesEps = 1.0;
-  }
-  epsReadout.innerHTML = diffSpeciesEps.toFixed(2);
-}
-
-function decSpeciesEps() {
-  if(diffSpeciesEps > 0.0) {
-    diffSpeciesEps -= 0.01;
-    if(diffSpeciesEps < 0.0) diffSpeciesEps = 0.0;
-  }
-  epsReadout.innerHTML = diffSpeciesEps.toFixed(2);
+function updateSpeciesCounts() {
+    var aNum = bNum = cNum = 0;
+    for(var i=0; i < N; i++ ) {
+        spec = species[i];
+        if(spec == "A") aNum++;
+        else if (spec == "B") bNum++;
+        else if (spec == "C") cNum++;
+    }
+    aReadout.innerHTML = aNum.toFixed(0);
+    bReadout.innerHTML = bNum.toFixed(0);
+    cReadout.innerHTML = cNum.toFixed(0);
 }
 
 // Change number of atoms in response to slider adjustment or +/- button click:
-function changeN(dN) {
+function changeN(dN, spec) {
   if (dN != null) {
     if ((N + dN < nSlider.min) || (N + dN > nSlider.max)) return;
     nSlider.value = N + dN;
@@ -853,7 +835,7 @@ function changeN(dN) {
     }
   }
   if (newN > N) {
-    addAtoms(newN);
+    addAtoms(newN, spec);
     nSlider.value = N;
   }
   nReadout.innerHTML = N;
@@ -865,6 +847,7 @@ function changeN(dN) {
   }
   resetStepsPerSec();
   paintCanvas();
+  updateSpeciesCounts();
 }
 
 // Change the size of the box:
@@ -1021,7 +1004,7 @@ function randomHue() {
 
 // Add atom to the simulation until N == newN (if there's room):
 // (This algorithm is inefficient when it doesn't matter and efficient when it does.)
-function addAtoms(newN) {
+function addAtoms(newN, spec) {
   var cellSize = 1.3;		// must be at least 1.0, preferably a little more
   var nCells = Math.floor(boxWidth / cellSize);	// number of cells in a row
   var occupied = new Array(nCells*nCells);		// keeps track of which cells are occupied
@@ -1063,9 +1046,7 @@ function addAtoms(newN) {
         y[N] = (cellY+0.5)*cellSize + (Math.random()-0.5)*epsilon;
         vx[N] = 0; vy[N] = 0;
         ax[N] = 0; ay[N] = 0;
-        if( Math.random() > bPercent )
-          species[N] = "A";
-        else species[N] = "B";
+        species[N] = spec || "A"; // default to species A if spec isnt specified
         N++;
         if (N == newN) return;
       }
@@ -1383,6 +1364,8 @@ function loadPreset() {
   paintCanvas();
   if (!running) startButton.innerHTML = "Start";
   presetSelect.selectedIndex = 0;		// reset menu to read "Presets" (doesn't work in iOS Safari)
+  
+  updateSpeciesCounts();
 }
 
 // kludge to handle iOS Safari bug, called by onblur:
@@ -1425,6 +1408,8 @@ function paintCanvas() {
         context.fillStyle = "#ffccff";
       } else if(species[i] == "B") {
         context.fillStyle = "#cc0066";
+      } else if(species[i] == "C") {
+        context.fillStyle = "#6699ff";
       }
     } else {
       context.fillStyle = theColorOption.value;

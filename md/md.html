@@ -125,23 +125,31 @@
 		</div>
 		<div style="margin-top:8px; text-align:left;">
 			<div style="float:right;">
-				<span class="custombutton" style="width:16px; height:16px; line-height:16px;" onclick="decSpecies();" ontouchstart="">−</span>
-				<span class="custombutton" style="width:16px; height:16px; line-height:16px;" onclick="incSpecies();" ontouchstart="">+</span>
+				<span class="custombutton" style="width:16px; height:16px; line-height:16px;" onclick="removeAtom('A');" ontouchstart="">−</span>
+				<span class="custombutton" style="width:16px; height:16px; line-height:16px;" onclick="addAtom('A');" ontouchstart="">+</span>
 			</div>
-			Percent of Species B = <span id="bReadout">0.4</span>
+			# of Species A = <span id="aReadout">500</span>
 		</div>
 		<div style="margin-top:8px; text-align:left;">
 			<div style="float:right;">
-				<span class="custombutton" style="width:16px; height:16px; line-height:16px;" onclick="decSpeciesEps();" ontouchstart="">−</span>
-				<span class="custombutton" style="width:16px; height:16px; line-height:16px;" onclick="incSpeciesEps();" ontouchstart="">+</span>
+				<span class="custombutton" style="width:16px; height:16px; line-height:16px;" onclick="removeAtom('B');" ontouchstart="">−</span>
+				<span class="custombutton" style="width:16px; height:16px; line-height:16px;" onclick="addAtom('B');" ontouchstart="">+</span>
 			</div>
-			Differing species strength = <span id="epsReadout">1.0</span>
+			# of Species B = <span id="bReadout">0</span>
 		</div>
 		<div style="margin-top:8px; text-align:left;">
 			<div style="float:right;">
+				<span class="custombutton" style="width:16px; height:16px; line-height:16px;" onclick="removeAtom('C');" ontouchstart="">−</span>
+				<span class="custombutton" style="width:16px; height:16px; line-height:16px;" onclick="addAtom('C');" ontouchstart="">+</span>
+			</div>
+			# of Species C = <span id="cReadout">0</span>
+		</div>
+		<div style="margin-top:8px; text-align:left;">
+<!--			<div style="float:right;">
 				<span class="custombutton" style="width:16px; height:16px; line-height:16px;" onclick="changeN(-1);" ontouchstart="">−</span>
 				<span class="custombutton" style="width:16px; height:16px; line-height:16px;" onclick="changeN(1);" ontouchstart="">+</span>
 			</div>
+-->
 			Number of atoms = <span id="nReadout">500</span>
 		</div>
 		<div>
